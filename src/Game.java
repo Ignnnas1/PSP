@@ -21,7 +21,7 @@ public class Game extends JPanel {
     private final int height;
     private static final int UPDATE_MS = 1000 / 60;
 
-    // Car container augmented with intersection index (keeps Car unchanged)
+
     private static final class CarEntry {
         final Car car;
         int ix;
@@ -31,12 +31,12 @@ public class Game extends JPanel {
     private long lastCarSpawn = 0;
     private final int spawnInterval = 1200;
 
-    // Levels
+
     private int level = 1;
     private long levelStartTime = System.currentTimeMillis();
     private static final int SURVIVE_DURATION_MS = 90_000;
 
-    // Spacing / jam
+
     private static final int LANE_SPACING = 40;
     private static final int JAM_LIMIT_PX = 200;
 
@@ -58,13 +58,13 @@ public class Game extends JPanel {
             this.cy = cy;
             this.size = size;
 
-            // Your validated stop lines (+/- 12)
+
             this.stopUp    = cy + size + 12;
             this.stopDown  = cy - 12;
             this.stopLeft  = cx + size + 12;
             this.stopRight = cx - 12;
 
-            // Light positions relative to the square (as in your original)
+
             this.north = new TrafficLight(cx + size/2 - 15, cy - 80);
             this.east  = new TrafficLight(cx + size + 60,   cy + size/2 - 15);
             this.south = new TrafficLight(cx + size/2 - 15, cy + size + 45);
@@ -90,7 +90,7 @@ public class Game extends JPanel {
         }
 
         void drawCenter(Graphics2D g2) {
-            // center (yellow) box
+
             g2.setColor(new Color(255, 215, 0, 160));
             g2.fillRect(cx, cy, size, size);
         }
@@ -127,7 +127,7 @@ public class Game extends JPanel {
 
     private final List<Intersection> intersections = new ArrayList<>();
 
-    // ===== Constructor (matches Game(boardWidth, boardHeight)) =====
+    // ===== Constructor =====
     public Game(int boardWidth, int boardHeight) {
         this.width = boardWidth;
         this.height = boardHeight;
@@ -157,7 +157,7 @@ public class Game extends JPanel {
         // Build initial level
         buildLevel(level);
 
-        // Click to change nearest traffic light (hit-test rectangles)
+
         addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 int mx = e.getX(), my = e.getY();
@@ -172,14 +172,14 @@ public class Game extends JPanel {
             }
         });
 
-        // Loop timer (Swing)
+
         loopTimer = new Timer(UPDATE_MS, (ActionEvent e) -> {
             update();
             repaint();
         });
     }
 
-    // Ensure we can grab focus for key events once added to a window
+
     @Override
     public void addNotify() {
         super.addNotify();
@@ -197,14 +197,14 @@ public class Game extends JPanel {
         levelStartTime = System.currentTimeMillis();
 
         if (lvl == 1) {
-            int size = (int)(width * 0.28);               // original
+            int size = (int)(width * 0.28);
             int cx = width/2 - size/2;
             int cy = height/2 - size/2;
             intersections.add(new Intersection(cx, cy, size));
-        } else if (lvl == 2) {  // <<< fixed: use 'lvl' (not 'level')
+        } else if (lvl == 2) {
             int size = (int)(width * 0.24);
 
-            // Spread farther apart horizontally (adjust if needed)
+
             int spacing = 250;
 
             int cx1 = width/2 - size - spacing/2;
@@ -260,7 +260,7 @@ public class Game extends JPanel {
 
             boolean shouldStop = red && approaching;
 
-            // Use your existing movement logic:
+
             car.update(shouldStop, stopLine, 0, 0, 0);
 
             return car.isOutOfBounds(width, height);
@@ -271,20 +271,19 @@ public class Game extends JPanel {
         for (CarEntry entry : cars) {
             Car c = entry.car;
 
-            // Only applies when two intersections exist
             if (intersections.size() < 2) continue;
 
             Intersection leftInt  = intersections.get(0);
             Intersection rightInt = intersections.get(1);
 
-            // ---- RIGHT moving cars (→) should switch to right intersection AFTER passing left intersection center
+
             if (c.getDirection() == Direction.RIGHT && entry.ix == 0) {
                 if (c.getX() > leftInt.cx + leftInt.size) {
                     entry.ix = 1; // Now belongs to second intersection
                 }
             }
 
-            // ---- LEFT moving cars (←) should switch to left intersection AFTER passing right intersection center
+
             if (c.getDirection() == Direction.LEFT && entry.ix == 1) {
                 if (c.getX() < rightInt.cx) {
                     entry.ix = 0;
@@ -405,7 +404,6 @@ public class Game extends JPanel {
             }
         }
 
-        // Level progression
         if (System.currentTimeMillis() - levelStartTime >= SURVIVE_DURATION_MS) {
             nextLevel();
         }
@@ -418,16 +416,16 @@ public class Game extends JPanel {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // 1) Draw all asphalt arms first
+
         for (Intersection it : intersections) it.drawArms(g2, width, height);
 
-        // 2) Draw all yellow centers on top (prevents overpaint)
+
         for (Intersection it : intersections) it.drawCenter(g2);
 
-        // 3) Draw lane dash lines
+
         for (Intersection it : intersections) it.drawLaneLines(g2, width, height);
 
-        // 4) Lights, cars, warnings, HUD
+
         for (Intersection it : intersections) it.drawLights(g2);
         for (CarEntry e : cars) e.car.draw(g2);
 
@@ -481,7 +479,7 @@ public class Game extends JPanel {
     }
 
     private void nextLevel() {
-        // If already at final level (2), winning the game ends it
+
         if (level == 2) {
             stop();
             JOptionPane.showMessageDialog(this, "You win! Thanks for playing!");
@@ -489,7 +487,7 @@ public class Game extends JPanel {
             return;
         }
 
-        // Otherwise go to next level normally
+
         level++;
         buildLevel(level);
     }
@@ -500,7 +498,7 @@ public class Game extends JPanel {
         Direction dir;
         double r = Math.random();
 
-        // Weighted spawn so L/R are rarer than U/D
+
         if (r < 0.45)       dir = Direction.UP;    // 45%
         else if (r < 0.85)  dir = Direction.DOWN;  // 40%
         else if (r < 0.93)  dir = Direction.LEFT;  // 8%
@@ -513,7 +511,7 @@ public class Game extends JPanel {
             int ix = (int)(Math.random() * intersections.size());
             it = intersections.get(ix);
         } else {
-            // LEFT/RIGHT: choose closest intersection to the approach side (prevents “double sets”)
+            // LEFT/RIGHT: choose closest intersection to the approach side
             if (dir == Direction.LEFT) {
                 it = intersections.stream().max(Comparator.comparingInt(a -> a.cx)).get();  // from right -> right-most intersection
             } else {

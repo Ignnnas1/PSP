@@ -19,12 +19,12 @@ public class TrafficLight {
         this.y = y;
     }
 
-    /** Called when the user clicks the light */
+
     public void requestChange() {
-        // Ignore clicks while transitioning
+
         if (transitioning) return;
 
-        // Can only trigger when in RED or GREEN
+
         if (state == TrafficLightState.RED || state == TrafficLightState.GREEN) {
             stateBeforeTransition = state;
             state = TrafficLightState.YELLOW;
@@ -33,14 +33,14 @@ public class TrafficLight {
         }
     }
 
-    /** Called each frame with delta time in ms */
+
     public void update(int deltaMs) {
         if (!transitioning) return;
 
         yellowTimer += deltaMs;
 
         if (yellowTimer >= yellowDuration) {
-            // Finish transition
+
             if (stateBeforeTransition == TrafficLightState.RED) {
                 // RED → YELLOW → GREEN
                 state = TrafficLightState.GREEN;

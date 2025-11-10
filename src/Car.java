@@ -3,7 +3,7 @@ import java.awt.*;
 public class Car {
     private double x, y;
     private final Direction dir;
-    private final double speed = 2.0; // constant movement speed
+    private final double speed = 2.0;
 
     private final int width = 18;
     private final int height = 30;
@@ -76,17 +76,6 @@ public class Car {
             case UP, DOWN -> g2.fillRect(drawX - width/2, drawY - height/2, width, height);
             case LEFT, RIGHT -> g2.fillRect(drawX - height/2, drawY - width/2, height, width);
         }
-    }
-    public Direction getDirection() {
-        return dir;
-    }
-    public boolean isBeforeIntersection(int stopX1, int stopY1, int stopX2, int stopY2) {
-        return switch (dir) {
-            case UP    -> y > stopX2;
-            case DOWN  -> y < stopY1;
-            case LEFT  -> x > stopY2;
-            case RIGHT -> x < stopX1;
-        };
     }
 
 
