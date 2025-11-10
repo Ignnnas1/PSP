@@ -77,6 +77,17 @@ public class Car {
             case LEFT, RIGHT -> g2.fillRect(drawX - height/2, drawY - width/2, height, width);
         }
     }
+    public Direction getDirection() {
+        return dir;
+    }
+    public boolean isBeforeIntersection(int stopX1, int stopY1, int stopX2, int stopY2) {
+        return switch (dir) {
+            case UP    -> y > stopX2;
+            case DOWN  -> y < stopY1;
+            case LEFT  -> x > stopY2;
+            case RIGHT -> x < stopX1;
+        };
+    }
 
 
 
